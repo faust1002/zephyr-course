@@ -1,0 +1,6 @@
+board:
+  name: our_board_from_scratch
+  full_name: Our board from scratch
+  vendor: Dummy vendor
+  socs:
+    - name: stm32wl55xx
