@@ -1,0 +1,6 @@
+board:
+  name: our_board_copy_rename
+  full_name: Our board copy rename
+  vendor: Dummy vendor
+  socs:
+    - name: stm32wl55xx
