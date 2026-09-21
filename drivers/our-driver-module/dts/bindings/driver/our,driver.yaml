@@ -1,0 +1,7 @@
+description: Our custom sensor driver binding
+compatible: "our,driver"
+
+properties:
+    callibration:
+        type: int
+        required: true

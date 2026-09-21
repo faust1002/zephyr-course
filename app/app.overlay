@@ -2,4 +2,10 @@
     aliases {
         app-led = "/leds/led_0";
     };
+
+    sensor: temp_sensor {
+        compatible = "our,driver";
+        callibration = <42>;
+        status = "okay";
+    };
 };
