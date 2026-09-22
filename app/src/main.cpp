@@ -1,11 +1,12 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/drivers/sensor.h>
+#include "our_driver.h"
 
 LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 int main(void)
 {
-    const struct device* dev = DEVICE_DT_GET_ANY(our_driver);
+    const struct device* dev = DEVICE_DT_GET(DT_NODELABEL(our_driver0));
     if (!device_is_ready(dev))
     {
         return -ENODEV;
@@ -19,6 +20,7 @@ int main(void)
         sensor_channel_get(dev,
                            dummy_sensor_channel,
                            &dummy_sensor_value);
+        our_driver_foo(dev);
     }
     return 0;
 }

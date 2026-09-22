@@ -3,7 +3,13 @@
         app-led = "/leds/led_0";
     };
 
-    sensor: temp_sensor {
+    our_driver0: our_driver0 {
+        compatible = "our,driver";
+        callibration = <37>;
+        status = "okay";
+    };
+
+    our_driver1: our_driver1 {
         compatible = "our,driver";
         callibration = <42>;
         status = "okay";

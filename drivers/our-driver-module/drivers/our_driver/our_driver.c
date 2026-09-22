@@ -1,6 +1,12 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/logging/log.h>
+#include "our_driver.h"
+
+struct our_driver_data {
+    struct k_mutex lock;
+    int counter;
+};
 
 #define DT_DRV_COMPAT our_driver
 
@@ -42,8 +48,28 @@ static int our_driver_init(const struct device* dev)
         return -ENODEV;
     }
 
+    struct our_driver_data* data = dev->data;
+    k_mutex_lock(&data->lock, K_FOREVER);
+    data->counter = 0;
+    k_mutex_unlock(&data->lock);
+
     return 0;
 }
 
-#define DEV_INST(inst) DEVICE_DT_INST_DEFINE(inst, our_driver_init, NULL, NULL, NULL, POST_KERNEL, 80, &our_driver_api);
-DT_INST_FOREACH_STATUS_OKAY(DEV_INST)
+#define OUR_DRIVER_DEFINE(inst)                           \
+    static struct our_driver_data data_##inst;            \
+    DEVICE_DT_INST_DEFINE(inst, our_driver_init, NULL, &data_##inst, NULL, POST_KERNEL, 80, &our_driver_api);
+
+DT_INST_FOREACH_STATUS_OKAY(OUR_DRIVER_DEFINE)
+
+int our_driver_foo(const struct device* dev) {
+    struct our_driver_data* data = dev->data;
+    k_mutex_lock(&data->lock, K_FOREVER);
+    ++data->counter;
+    data->counter &= 0xFF;
+    int counter = data->counter;
+    k_mutex_unlock(&data->lock);
+    LOG_INF("Counter value = %d", counter);
+    return counter;
+}
+
