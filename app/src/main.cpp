@@ -20,7 +20,7 @@ int main(void)
         sensor_channel_get(dev,
                            dummy_sensor_channel,
                            &dummy_sensor_value);
-        our_driver_foo(dev);
+        our_driver_set(dev, 37);
     }
     return 0;
 }

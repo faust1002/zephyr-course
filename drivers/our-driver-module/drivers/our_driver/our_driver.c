@@ -64,11 +64,11 @@ static int our_driver_init(const struct device* dev)
 
 DT_INST_FOREACH_STATUS_OKAY(OUR_DRIVER_DEFINE)
 
-int our_driver_foo(const struct device* dev) {
+int our_driver_set(const struct device* dev,
+                   int new_value) {
     struct our_driver_data* data = dev->data;
     k_mutex_lock(&data->lock, K_FOREVER);
-    ++data->counter;
-    data->counter &= 0xFF;
+    data->counter = new_value;
     int counter = data->counter;
     k_mutex_unlock(&data->lock);
     LOG_INF("Counter value = %d", counter);

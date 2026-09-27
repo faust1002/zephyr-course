@@ -1,15 +1,12 @@
 #include <zephyr/shell/shell.h>
 #include <zephyr/drivers/sensor.h>
+#include "our_driver.h"
 
 static int cmd_sensor_fetch(const struct shell *sh, size_t argc, char **argv)
 {
-    shell_print(sh, "cmd_sensor_fetch called");
+    ARG_UNUSED(argc);
 
-    if (argc != 2)
-    {
-        shell_error(sh, "usage sensor fetch <device name>");
-        return -EFAULT;
-    }
+    shell_print(sh, "cmd_sensor_fetch called");
 
     const struct device *dev = shell_device_get_binding(argv[1]);
     if (!dev)
@@ -32,13 +29,7 @@ static int cmd_sensor_fetch(const struct shell *sh, size_t argc, char **argv)
 
 static int cmd_sensor_read(const struct shell *sh, size_t argc, char **argv)
 {
-    shell_print(sh, "cmd_sensor_read called");
-
-    if (argc != 2)
-    {
-        shell_error(sh, "usage sensor fetch <device name>");
-        return -EFAULT;
-    }
+    ARG_UNUSED(argc);
 
     const struct device *dev = shell_device_get_binding(argv[1]);
     if (!dev)
@@ -61,13 +52,9 @@ static int cmd_sensor_read(const struct shell *sh, size_t argc, char **argv)
 
 static int cmd_sensor_info(const struct shell *sh, size_t argc, char **argv)
 {
-    shell_print(sh, "cmd_sensor_info called");
+    ARG_UNUSED(argc);
 
-    if (argc != 2)
-    {
-        shell_error(sh, "usage sensor fetch <device name>");
-        return -EFAULT;
-    }
+    shell_print(sh, "cmd_sensor_info called");
 
     const struct device *dev = shell_device_get_binding(argv[1]);
     if (!dev)
@@ -83,10 +70,47 @@ static int cmd_sensor_info(const struct shell *sh, size_t argc, char **argv)
     return 0;
 }
 
+static int cmd_sensor_set(const struct shell *sh, size_t argc, char **argv)
+{
+    ARG_UNUSED(argc);
+
+    shell_print(sh, "cmd_sensor_set called");
+
+    int error = 0;
+    long value = shell_strtol(argv[2], 10, &error);
+    if (error != 0)
+    {
+        shell_error(sh, "Invalid integer value = %s, (error = %d)", argv[2], error);
+        return -EFAULT;
+    }
+
+    const int min_value = 0x37;
+    const int max_value = 0x42;
+    if ((value < min_value) || (value > max_value))
+    {
+        shell_error(sh, "Value out of range (min: %d, max: %d), actual value = %ld", min_value, max_value, value);
+        return -EFAULT;
+    }
+
+    int actual_value = (int)value;
+
+    const struct device *dev = shell_device_get_binding(argv[1]);
+    if (!dev)
+    {
+        shell_error(sh, "Could not find device %s", argv[1]);
+        return -EFAULT;
+    }
+
+    our_driver_set(dev, actual_value);
+
+    return 0;
+}
+
 SHELL_STATIC_SUBCMD_SET_CREATE(sensor_subcommands,
-    SHELL_CMD(fetch, NULL, "Call sensor_sample_fetch()", cmd_sensor_fetch),
-    SHELL_CMD(read, NULL, "Call sensor_channel_get()", cmd_sensor_read),
-    SHELL_CMD(info, NULL, "Print device name and ready state", cmd_sensor_info),
+    SHELL_CMD_ARG(fetch, NULL, "Call sensor_sample_fetch()", cmd_sensor_fetch, 2, 0),
+    SHELL_CMD_ARG(read, NULL, "Call sensor_channel_get()", cmd_sensor_read, 2, 0),
+    SHELL_CMD_ARG(info, NULL, "Print device name and ready state", cmd_sensor_info, 2, 0),
+    SHELL_CMD_ARG(set, NULL, "Set new counter value", cmd_sensor_set, 3, 0),
     SHELL_SUBCMD_SET_END
 );
 
