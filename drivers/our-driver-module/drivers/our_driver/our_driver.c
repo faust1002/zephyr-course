@@ -29,6 +29,8 @@ static int our_driver_channel_get(const struct device *dev,
 {
     LOG_INF("Hello from our_driver_channel_get, channel: %d", chan);
     gpio_pin_set_dt(&app_led, 1);
+    val->val1 = 0x37;
+    val->val2 = 0x42;
     return 0;
 }
 
